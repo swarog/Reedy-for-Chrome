@@ -18,6 +18,9 @@
 				"js/content/Parser.js",
 				"js/content/Sequencer.js",
 				"js/content/View.js",
+				"js/content/ContentNode.js",
+				"js/content/ContentNodeText.js",
+				"js/content/ContentParser.js",
 				"js/content/Reader.js",
 				"js/content/ContentSelector.js",
 				"js/content/content.js"

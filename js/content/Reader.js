@@ -10,24 +10,40 @@
 			.replace(/\s+/g, ' ')
 			.replace(new RegExp('\\s*'+sign+'\\s*', 'g'), sign)     // `      \n    `
 			.replace(new RegExp(sign, 'g'), '\n');
+
 	}
 	
 	function cleanUpTextAdvanced(raw) {
 		var NL = '~NL'+(+(new Date())+'').slice(-5)+'NL~';
-		return raw
-			.trim()
-			.replace(/\n|\r/gm, NL)
-			.replace(/\s+/g, ' ')
-			.replace(new RegExp('\\s*'+NL+'\\s*', 'g'), NL)                     // `      \n    `
-			.replace(/‐/g, '-')                                                 // short dash will be replaced with minus
-			.replace(/ \- /g, ' — ')                                            // replace minus between words with em dash
-			.replace(/–|−|―/g, '—')                                             // there are 5 dash types. after the cleaning only 2 will remain: minus and em dash
-			.replace(/[-|—]{2,}/g, '—')                                         // `--` | `------`
-			.replace(new RegExp('( |^|'+NL+')([([«]+) ', 'g'), '$1$2')          // `сюжет ( видео`
-			.replace(new RegExp(' ([)\\].,!?;»]+)( |$|'+NL+')', 'g'), '$1$2')   // `вставка ) отличный` | `конечно ...` | ` , ` | ` .\n`
-			.replace(/\.{4,}/g, '...')                                          // `.......`
-			.replace(/([!?]{3})[!?]+/g, '$1')                                   // `неужели!!!!!???!!?!?`
-			.replace(new RegExp(NL, 'g'), '\n');
+		// TODO: Не очень хорошо разбивать и сново собирать текст, возможно функцию чистки лучше вытащить в первичный парсер
+        var result = [], reassembledText;
+        raw.forEach(function (item) {
+            if(item instanceof app.ContentNodeText) {
+                reassembledText += item.getContent();
+            } else {
+                // TODO: Разобраться нахрена все эти чистки????
+                reassembledText = reassembledText
+                    .trim()
+                    .replace(/\n|\r/gm, NL)
+                    .replace(/\s+/g, ' ')
+                    .replace(new RegExp('\\s*'+NL+'\\s*', 'g'), NL)                     // `      \n    `
+                    .replace(/‐/g, '-')                                                 // short dash will be replaced with minus
+                    .replace(/ \- /g, ' — ')                                            // replace minus between words with em dash
+                    .replace(/–|−|―/g, '—')                                             // there are 5 dash types. after the cleaning only 2 will remain: minus and em dash
+                    .replace(/[-|—]{2,}/g, '—')                                         // `--` | `------`
+                    .replace(new RegExp('( |^|'+NL+')([([«]+) ', 'g'), '$1$2')          // `сюжет ( видео`
+                    .replace(new RegExp(' ([)\\].,!?;»]+)( |$|'+NL+')', 'g'), '$1$2')   // `вставка ) отличный` | `конечно ...` | ` , ` | ` .\n`
+                    .replace(/\.{4,}/g, '...')                                          // `.......`
+                    .replace(/([!?]{3})[!?]+/g, '$1')                                   // `неужели!!!!!???!!?!?`
+                    .replace(new RegExp(NL, 'g'), '\n');
+                app.ContentParser(reassembledText).forEach(function (contentNode) {
+                   result.push(contentNode);
+                });
+                result.push(item);
+                reassembledText = '';
+            }
+        });
+		return result;
 	}
 	
 	

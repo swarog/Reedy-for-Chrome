@@ -122,7 +122,8 @@
 	
 	function runReaderAndExit() {
 		if ($current) {
-			app.startReader($current.innerText.trim());
+			var content = app.ContentParser($current);
+			app.startReader(content);
 		}
 		app.stopContentSelection();
 	}

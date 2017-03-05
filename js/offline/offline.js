@@ -2,7 +2,7 @@
 
 function onStartReadingBtn() {
 	var text = $textarea.value.trim();
-	
+
 	if (text.length) {
 		app.startReader(text);
 		app.event('Reader', 'Open', 'Offline');

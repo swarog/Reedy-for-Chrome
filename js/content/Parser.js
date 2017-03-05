@@ -606,7 +606,14 @@
 	app.parse3 = function(raw) {
 		return stateMachine(app.parse2(raw), patterns_level3);
 	}
-	
+
+    /**
+     * @param raw строка с текстом для ридера
+     * @returns {Array} массив объектов "токенов" с описанием сложности каждого слова из входной строки
+     *          сложность расчитывается исходя из положения строки в предложении, ее длинны, наличия
+     *          знаков препинания и т.д.
+     *
+     */
 	app.parse4 = function(raw) {
 		
 		function create() {
