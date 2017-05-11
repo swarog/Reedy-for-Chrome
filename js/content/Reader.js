@@ -13,40 +13,6 @@
 
 	}
 	
-	function cleanUpTextAdvanced(raw) {
-		var NL = '~NL'+(+(new Date())+'').slice(-5)+'NL~';
-		// TODO: Не очень хорошо разбивать и сново собирать текст, возможно функцию чистки лучше вытащить в первичный парсер
-        var result = [], reassembledText;
-        raw.forEach(function (item) {
-            if(item instanceof app.ContentNodeText) {
-                reassembledText += item.getContent();
-            } else {
-                // TODO: Разобраться нахрена все эти чистки????
-                reassembledText = reassembledText
-                    .trim()
-                    .replace(/\n|\r/gm, NL)
-                    .replace(/\s+/g, ' ')
-                    .replace(new RegExp('\\s*'+NL+'\\s*', 'g'), NL)                     // `      \n    `
-                    .replace(/‐/g, '-')                                                 // short dash will be replaced with minus
-                    .replace(/ \- /g, ' — ')                                            // replace minus between words with em dash
-                    .replace(/–|−|―/g, '—')                                             // there are 5 dash types. after the cleaning only 2 will remain: minus and em dash
-                    .replace(/[-|—]{2,}/g, '—')                                         // `--` | `------`
-                    .replace(new RegExp('( |^|'+NL+')([([«]+) ', 'g'), '$1$2')          // `сюжет ( видео`
-                    .replace(new RegExp(' ([)\\].,!?;»]+)( |$|'+NL+')', 'g'), '$1$2')   // `вставка ) отличный` | `конечно ...` | ` , ` | ` .\n`
-                    .replace(/\.{4,}/g, '...')                                          // `.......`
-                    .replace(/([!?]{3})[!?]+/g, '$1')                                   // `неужели!!!!!???!!?!?`
-                    .replace(new RegExp(NL, 'g'), '\n');
-                app.ContentParser(reassembledText).forEach(function (contentNode) {
-                   result.push(contentNode);
-                });
-                result.push(item);
-                reassembledText = '';
-            }
-        });
-		return result;
-	}
-	
-	
 	app.Reader = function(raw) {
 		
 		function onSettingsUpdate(e, key, value) {
@@ -114,14 +80,14 @@
 			if (app.get('entityAnalysis')) {
 				_cache_seqSimple && (tokenStartIndex = _cache_seqSimple.getToken().startIndex);
 				
-				currentText = _cache_textAdvanced = _cache_textAdvanced || cleanUpTextAdvanced(raw);
+				currentText = _cache_textAdvanced = _cache_textAdvanced || raw;
 				currentSeq = _cache_seqAdvanced = _cache_seqAdvanced || new app.Sequencer(_cache_textAdvanced, app.advancedParser(_cache_textAdvanced));
 			}
 			else {
 				_cache_seqAdvanced && (tokenStartIndex = _cache_seqAdvanced.getToken().startIndex);
 				
 				currentText = _cache_textSimple = _cache_textSimple || cleanUpTextSimple(raw);
-				currentSeq = _cache_seqSimple = _cache_seqSimple || new app.Sequencer(_cache_textSimple, app.simpleParser(_cache_textSimple));
+				currentSeq = _cache_seqSimple = _cache_seqSimple || new app.Sequencer(_cache_textSimple);
 			}
 			
 			view.setSequencer(currentSeq);

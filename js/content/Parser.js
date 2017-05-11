@@ -683,8 +683,8 @@
 	
 	
 	app.advancedParser = function(raw) {
-		var timeStart = new Date(),
-			res = app.parse4(raw);
+		var timeStart = new Date();
+		var res = app.parse4(raw);
 		
 		app.event('Parsing time', 'Advanced', app.roundExp(new Date() - timeStart));
 		

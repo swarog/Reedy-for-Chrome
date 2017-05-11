@@ -117,7 +117,10 @@
 		
 		var api = this,
 			wasLaunchedSinceOpen = false,
-			length = data.length,
+			//length = data.length,
+			length = raw.reduce(function (acc, contentNode) {
+                return acc + contentNode.getComplexity().length;
+            }),
 			textLength = raw.length,
 			token = data[0],
 			wpm = 0, startWpm = 0,
